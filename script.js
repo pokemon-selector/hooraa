@@ -1,10 +1,6 @@
 let playerName = "ゲスト";
 let currentStage = 1; // 1〜5の異変ステージ
 
-// ==========================================
-// 小説のテキストデータベース
-// 後から文章や異変の仕組みを変更したい場合は、ここを編集します
-// ==========================================
 const novelTexts = {
     1: `<p class="novel-p">あの日、僕は見てはいけないものを見た。夕暮れの学校の帰り道、細い路地の奥に、<span class="vibrate-text">ウ</span>ズくまる影があった。</p>
         <p class="novel-p">影は、こちらをじっと見つめている気がした。怖くなって走って逃げたが、足音がピッタリと<span class="vibrate-text">シ</span>がみつくように付いてくる。</p>
@@ -13,7 +9,7 @@ const novelTexts = {
     
     2: `<p class="novel-p">異変はそれだけでは終わらなかった。次の日から、僕のスマートフォンの画面が時々おかしくなるのだ。</p>
         <p class="novel-p corrupted-text" id="glitch-text">縺ゅ≠縺溘∪縺がいかれ繧区container縺ｿ縺､縺代◆縺励ｓ縺</p>
-        <p class="novel-p">文字が真っ赤に染まり、バグのような記号が羅列される。けれど、その文字列をじっくり凝視して【ドラッグして選択】してみると、そこには明確な「意志」が隠されていることに気がついた。</p>`,
+        <p class="novel-p">文字が真っ跨に染まり、バグのような記号が羅列される。けれど、その文字列をじっくり凝視して【ドラッグして選択】してみると、そこには明確な「意志」が隠されていることに気がついた。</p>`,
     
     3: `<p class="novel-p">視線が、部屋のいたるところから突き刺さる。上から、下から、壁の隙間から。</p>
         <p class="novel-p">空間そのものが、ガタガタと歪み始めているような感覚（画面ノイズ）に襲われる。どこかに、この呪いの発信源となる『黒い核』が潜んでいるはずだ。早くそれを見つけて、消さなければ、僕は……。</p>`,
@@ -24,9 +20,21 @@ const novelTexts = {
         <p class="novel-p">この呪いを完全に終わらせるための対価が必要だ。この怪異に、生年生死の生贄となる者の「登録した名前」を正確に差し出せば、この苦しみから解放されるのだろうか？</p>`
 };
 
-// ==========================================
-// 1. 新規登録処理
-// ==========================================
+// 修正：HTMLが読み込まれたら確実にボタンイベントを登録する
+document.addEventListener("DOMContentLoaded", () => {
+    const regBtn = document.getElementById("register-submit-btn");
+    const nameInput = document.getElementById("username-input");
+
+    if (regBtn) {
+        regBtn.addEventListener("click", startRegistration);
+    }
+    if (nameInput) {
+        nameInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") startRegistration();
+        });
+    }
+});
+
 function startRegistration() {
     const input = document.getElementById("username-input").value.trim();
     if (!input) {
@@ -35,32 +43,23 @@ function startRegistration() {
     }
     playerName = input;
     
-    // HTML内の「.player-name」クラスを持つ要素のテキストをすべてユーザー名に書き換える
     const nameBadges = document.querySelectorAll(".player-name");
     nameBadges.forEach(badge => badge.innerText = playerName);
 
-    // 小説画面へ切り替え
     switchPhase("phase-register", "phase-novel");
     loadStage();
 }
 
-// ==========================================
-// 汎用機能：フェーズ切り替え
-// ==========================================
 function switchPhase(fromId, toId) {
     document.getElementById(fromId).classList.remove("active");
     document.getElementById(toId).classList.add("active");
     window.scrollTo(0,0);
 }
 
-// ==========================================
-// ステージ内容の読み込みと特殊環境の設定
-// ==========================================
 function loadStage() {
     document.getElementById("novel-body-text").innerHTML = novelTexts[currentStage];
     document.getElementById("solve-input").value = "";
     
-    // 異変3：画面バグノイズと隠しアイコンの表示
     if (currentStage === 3) {
         document.body.classList.add("glitch-bg");
         document.getElementById("curse-icon").style.display = "block";
@@ -69,22 +68,17 @@ function loadStage() {
         document.getElementById("curse-icon").style.display = "none";
     }
 
-    // 異変4・5：ヒントラベルの文言変更や演出トリガー
     if (currentStage === 4) {
         document.getElementById("hint-label").innerText = "すべての警告を消し去れ（ポップアップが3回出ます）";
     } else if (currentStage === 5) {
         document.getElementById("hint-label").innerText = "呪いを完了させるため、あなたの「名前」を入力してください";
-        document.getElementById("shadow-overlay").style.display = "block"; // 画面外側の黒い影を表示
+        document.getElementById("shadow-overlay").style.display = "block";
     }
 }
 
-// ==========================================
-// 謎解きの判定ロジック
-// ==========================================
 function checkAnswer() {
     const answer = document.getElementById("solve-input").value.trim();
 
-    // 各ステージごとの正解チェック
     if (currentStage === 1) {
         if (answer === "ウシロ" || answer === "うしろ") {
             nextStageSuccess();
@@ -103,7 +97,6 @@ function checkAnswer() {
         alert("文字を入力しても効果がない！画面のどこかに潜む『呪いの核（黒い点）』を直接クリックして破壊しろ！");
     } 
     else if (currentStage === 4) {
-        // ポップアップを連続で出させるホラーイベント
         alert("警告：システムが著しく汚染されています。");
         alert("警告：深淵があなたを覗いています。");
         alert("警告：後ろを振り返らないでください。");
@@ -124,22 +117,18 @@ function checkAnswer() {
     }
 }
 
-// 異変3の特殊クリア（隠しアイコンクリック時にJSから呼ばれる）
 function solveAnomal3() {
     alert("呪いの核を破壊しました。歪みが収まります。");
     nextStageSuccess();
 }
 
-// 正解時の進行・演出処理
 function nextStageSuccess() {
-    // 一瞬画面を赤くフラッシュさせる
     document.body.classList.add("flash-red");
     setTimeout(() => { 
         document.body.classList.remove("flash-red"); 
     }, 200);
 
     if (currentStage === 3) {
-        // 3つの異変を解決したので、一度中間ニュースフェーズへ
         currentStage = 4;
         switchPhase("phase-novel", "phase-mid-news");
     } else {
@@ -148,26 +137,20 @@ function nextStageSuccess() {
     }
 }
 
-// 中間ニュースから後半戦（ステージ4）へ戻る
 function backToNovelPart2() {
     switchPhase("phase-mid-news", "phase-novel");
     loadStage();
 }
 
-// ==========================================
-// 最終演出：呪いの完成から死亡ニュースへ
-// ==========================================
 function executeFinalRitual() {
     document.getElementById("shadow-overlay").style.display = "none";
     switchPhase("phase-novel", "phase-ritual-end");
     
-    // 0.5秒後に「ありがとう。呪いは完成された。」をじわっと表示
     setTimeout(() => {
         const endText = document.getElementById("end-message");
         endText.style.opacity = 1;
     }, 500);
 
-    // その4.5秒後、自分が死亡したニュースページへ強制転送
     setTimeout(() => {
         switchPhase("phase-ritual-end", "phase-final-news");
     }, 4500);
