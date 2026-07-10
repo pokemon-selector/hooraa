@@ -1,5 +1,5 @@
 let playerName = "ゲスト";
-let currentStage = 1; // 1〜5の異変ステージ
+let currentStage = 1;
 
 const novelTexts = {
     1: `<p class="novel-p">あの日、僕は見てはいけないものを見た。夕暮れの学校の帰り道、細い路地の奥に、<span class="vibrate-text">ウ</span>ズくまる影があった。</p>
@@ -9,7 +9,7 @@ const novelTexts = {
     
     2: `<p class="novel-p">異変はそれだけでは終わらなかった。次の日から、僕のスマートフォンの画面が時々おかしくなるのだ。</p>
         <p class="novel-p corrupted-text" id="glitch-text">縺ゅ≠縺溘∪縺がいかれ繧区container縺ｿ縺､縺代◆縺励ｓ縺</p>
-        <p class="novel-p">文字が真っ跨に染まり、バグのような記号が羅列される。けれど、その文字列をじっくり凝視して【ドラッグして選択】してみると、そこには明確な「意志」が隠されていることに気がついた。</p>`,
+        <p class="novel-p">文字が真っ赤に染まり、バグのような記号が羅列される。けれど、その文字列をじっくり凝視して【ドラッグして選択】してみると、そこには明確な「意志」が隠されていることに気がついた。</p>`,
     
     3: `<p class="novel-p">視線が、部屋のいたるところから突き刺さる。上から、下から、壁の隙間から。</p>
         <p class="novel-p">空間そのものが、ガタガタと歪み始めているような感覚（画面ノイズ）に襲われる。どこかに、この呪いの発信源となる『黒い核』が潜んでいるはずだ。早くそれを見つけて、消さなければ、僕は……。</p>`,
@@ -20,14 +20,26 @@ const novelTexts = {
         <p class="novel-p">この呪いを完全に終わらせるための対価が必要だ。この怪異に、生年生死の生贄となる者の「登録した名前」を正確に差し出せば、この苦しみから解放されるのだろうか？</p>`
 };
 
-// 修正：HTMLが読み込まれたら確実にボタンイベントを登録する
+// 起動時に確実に登録ボタンをプログラム側から生成する
 document.addEventListener("DOMContentLoaded", () => {
-    const regBtn = document.getElementById("register-submit-btn");
-    const nameInput = document.getElementById("username-input");
-
-    if (regBtn) {
-        regBtn.addEventListener("click", startRegistration);
+    const container = document.getElementById("btn-container");
+    if (container) {
+        // ボタンを動的に生成
+        const button = document.createElement("button");
+        button.id = "dynamic-reg-btn";
+        button.className = "reg-btn";
+        button.innerText = "登録して読み始める";
+        button.style.cursor = "pointer";
+        
+        // クリックイベントを直接付与
+        button.addEventListener("click", () => {
+            startRegistration();
+        });
+        
+        container.appendChild(button);
     }
+
+    const nameInput = document.getElementById("username-input");
     if (nameInput) {
         nameInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") startRegistration();
