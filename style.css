@@ -1,8 +1,4 @@
-お待たせしました！デザインと不気味なホラー演出（文字の震えや画面の歪みなど）を担当する「CSSファイル（style.css）」です。
 
-これを index.html と同じフォルダに「style.css」という名前で保存してください。
-
-🎨 style.css
 CSS
 :root {
     --bg-clean: #ffffff;
